@@ -20,7 +20,7 @@ class Mobile_Order_CPT_Food {
 	 * @since 0.1.0
 	 */
 	public function hooks() {
-		add_action( 'init', array( $this, 'register_cpt' ) );
+		add_action( 'init', array( $this, 'register_cpt' ), 20 );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 10 );
 		add_filter( 'manage_food_posts_columns', array( $this, 'add_meta_to_admin_columns' ), 10, 1 );
 		add_filter( 'manage_food_posts_custom_column', array( $this, 'add_column_content_for_meta' ), 10, 2 );

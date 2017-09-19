@@ -41,8 +41,10 @@ class Mobile_Order_Taxonomy_Menu {
 	        array(
 	            'labels' => $labels,
 	            'public' => true,
+				'query_var'         => true,
 	            'rewrite' => array(
-	            	'slug' => 'menus'
+	            	'slug' => 'menu',
+					'with_front'	=> true
 	            ),
 	            'hierarchical' => true,
 	        )
