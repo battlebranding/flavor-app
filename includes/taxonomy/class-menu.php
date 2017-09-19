@@ -14,6 +14,13 @@ class Mobile_Order_Taxonomy_Menu {
 	 */
 	public function hooks() {
 		add_action( 'init', array( $this, 'register_taxonomy' ) );
+		add_action( 'food_menu_add_form_fields', array( $this, 'add_order_field' ), 10 );
+		add_action( 'food_menu_edit_form_fields', array( $this, 'edit_order_field' ), 10, 2 );
+		add_action( 'created_food_menu', array( $this, 'save_order_meta' ), 10, 2 );
+		add_action( 'edited_food_menu', array( $this, 'save_order_meta' ), 10, 2 );
+		add_filter( 'manage_edit-food_menu_columns', array( $this, 'add_order_column' ) );
+		add_filter( 'manage_food_menu_custom_column', array( $this, 'add_order_column_content' ), 10, 3 );
+		add_action( 'pre_get_terms', array( $this, 'sort_food_menus' ) );
 	}
 
 	/**
@@ -49,6 +56,82 @@ class Mobile_Order_Taxonomy_Menu {
 	            'hierarchical' => true,
 	        )
 	    );
+
+	}
+
+	public function add_order_field() {
+	    ?><div class="form-field term-group">
+	        <label for="tag-order"><?php _e( 'Display Order', 'flavor-app'); ?></label>
+	        <input name="tag-order" id="tag-order" type="text" value="" size="20" aria-required="true" />
+	    </div><?php
+	}
+
+	function edit_order_field( $term, $taxonomy ) {
+
+		// get current order
+	    $order = get_term_meta( $term->term_id, 'order', true );
+
+	    ?><tr class="form-field term-group-wrap">
+	        <th scope="row"><label for="tag-order"><?php _e( 'Display Order', 'flavor-app' ); ?></label></th>
+	        <td><input name="tag-order" id="tag-order" type="text" value="<?php echo esc_attr( $order ); ?>" size="20" aria-required="true" /></td>
+	    </tr><?php
+	}
+
+	public function save_order_meta( $term_id, $tt_id ){
+	    if( isset( $_POST['tag-order'] ) && '' !== $_POST['tag-order'] ){
+	        $order = sanitize_title( $_POST['tag-order'] );
+	        update_term_meta( $term_id, 'order', $order, true );
+	    }
+	}
+
+	function add_order_column( $columns ){
+	    $columns['order'] = __( 'Display Order', 'flavor-app' );
+	    return $columns;
+	}
+
+	function add_order_column_content( $content, $column_name, $term_id ){
+
+	    if ( $column_name !== 'order' ) {
+	        return $content;
+	    }
+
+		$content = 0;
+
+	    $term_id = absint( $term_id );
+	    $order = get_term_meta( $term_id, 'order', true );
+
+	    if ( ! empty( $order ) ) {
+	        $content = esc_attr( $order );
+	    }
+
+	    return $content;
+	}
+
+	public function sort_food_menus( $query ) {
+
+		if ( in_array( 'food_menu', $query->query_vars['taxonomy'] ) ) {
+
+			$args = array(
+				'relation' => 'OR',
+	          	'order_clause' => array(
+	            	'key' => 'order',
+	            	'type' => 'NUMERIC'
+	          	),
+	          	array(
+	            	'key' => 'order',
+	            	'compare' => 'NOT EXISTS'
+	          	)
+	        );
+
+	        $query->meta_query = new WP_Meta_Query( $args );
+
+			$query->query_vars['orderby'] 	= 'meta_value_num';
+			// $query->query_vars['meta_key']	= 'order';
+			// print_r( $query ); exit;
+
+		}
+
+		return $query;
 
 	}
 
