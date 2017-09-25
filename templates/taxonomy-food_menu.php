@@ -47,8 +47,9 @@
 			}
 
 			$food_menu[ $menu->slug ]['items'][] = array(
-				'menu_title'	=> $sub_menu->name,
-				'items'			=> $food,
+				'menu_title'		=> $sub_menu->name,
+				'menu_description'	=> $sub_menu->description,
+				'items'				=> $food,
 			);
 
 		}
@@ -131,6 +132,9 @@
 				<?php foreach ( get_food_in_menu( $food_menu ) as $menu ): ?>
 					<?php foreach ( $menu['items'] as $sub_menu ): ?>
 						<h3 class="has-text-centered"><?php esc_html_e( $sub_menu['menu_title'], 'bb-blueprint' ); ?></h3>
+						<?php if ( $sub_menu['menu_description'] ): ?>
+							<p class="has-text-centered"><?php echo esc_attr( $sub_menu['menu_description'], 'bb-blueprint' ); ?></p>
+						<?php endif; ?>
 						<ul class="food-menu" style="clear: both; list-style: none; padding-left: 0; overflow: hidden;">
 							<?php foreach ( $sub_menu['items'] as $item ): ?>
 								<li class="food-menu-item">
