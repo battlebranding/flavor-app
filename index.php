@@ -94,6 +94,7 @@ class Mobile_Order {
 		$order			= new Mobile_Order_Object_Order();
 		$template		= new Mobile_Order_Object_Template( $this );
 		$food_template	= new Mobile_Order_Template_Food( $this );
+		$food_tag		= new Mobile_Order_Taxonomy_Tag();
 
 	}
 

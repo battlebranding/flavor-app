@@ -15,9 +15,13 @@ class Mobile_Order_Taxonomy_Menu {
 	public function hooks() {
 		add_action( 'init', array( $this, 'register_taxonomy' ) );
 		add_action( 'food_menu_add_form_fields', array( $this, 'add_order_field' ), 10 );
+		add_action( 'food_menu_add_form_fields', array( $this, 'add_pdf_field' ), 10 );
 		add_action( 'food_menu_edit_form_fields', array( $this, 'edit_order_field' ), 10, 2 );
+		add_action( 'food_menu_edit_form_fields', array( $this, 'edit_pdf_field' ), 10, 2 );
 		add_action( 'created_food_menu', array( $this, 'save_order_meta' ), 10, 2 );
 		add_action( 'edited_food_menu', array( $this, 'save_order_meta' ), 10, 2 );
+		add_action( 'created_food_menu', array( $this, 'save_pdf_meta' ), 10, 2 );
+		add_action( 'edited_food_menu', array( $this, 'save_pdf_meta' ), 10, 2 );
 		add_filter( 'manage_edit-food_menu_columns', array( $this, 'add_order_column' ) );
 		add_filter( 'manage_food_menu_custom_column', array( $this, 'add_order_column_content' ), 10, 3 );
 		add_action( 'pre_get_terms', array( $this, 'sort_food_menus' ) );
@@ -61,8 +65,15 @@ class Mobile_Order_Taxonomy_Menu {
 
 	public function add_order_field() {
 	    ?><div class="form-field term-group">
-	        <label for="tag-order"><?php _e( 'Display Order', 'flavor-app'); ?></label>
+	        <label for="tag-order"><?php _e( 'Display Order', 'flavor-app' ); ?></label>
 	        <input name="tag-order" id="tag-order" type="text" value="" size="20" aria-required="true" />
+	    </div><?php
+	}
+
+	public function add_pdf_field() {
+	    ?><div class="form-field term-group">
+	        <label for="tag-pdf"><?php _e( 'PDF Version (URL)', 'flavor-app' ); ?></label>
+	        <input name="tag-pdf" id="tag-pdf" type="text" value="" size="20" aria-required="true" />
 	    </div><?php
 	}
 
@@ -77,10 +88,28 @@ class Mobile_Order_Taxonomy_Menu {
 	    </tr><?php
 	}
 
+	function edit_pdf_field( $term, $taxonomy ) {
+
+		// get current order
+	    $pdf = get_term_meta( $term->term_id, 'pdf', true );
+
+	    ?><tr class="form-field term-group-wrap">
+	        <th scope="row"><label for="tag-pdf"><?php _e( 'PDF Version (URL)', 'flavor-app' ); ?></label></th>
+	        <td><input name="tag-pdf" id="tag-pdf" type="text" value="<?php echo esc_attr( $pdf ); ?>" size="20" aria-required="true" /></td>
+	    </tr><?php
+	}
+
 	public function save_order_meta( $term_id, $tt_id ){
 	    if( isset( $_POST['tag-order'] ) && '' !== $_POST['tag-order'] ){
 	        $order = sanitize_title( $_POST['tag-order'] );
 	        update_term_meta( $term_id, 'order', $order, true );
+	    }
+	}
+
+	public function save_pdf_meta( $term_id, $tt_id ){
+	    if( isset( $_POST['tag-pdf'] ) && '' !== $_POST['tag-pdf'] ){
+	        $pdf = sanitize_url( $_POST['tag-pdf'] );
+	        update_term_meta( $term_id, 'pdf', $pdf, true );
 	    }
 	}
 
