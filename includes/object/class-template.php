@@ -30,7 +30,8 @@ class Mobile_Order_Object_Template {
 	 */
 	public function hooks() {
 		add_filter( 'template_include', array( $this, 'load_template' ), 20, 1 );
-		add_action( 'pre_get_posts', array( $this, 'set_menu_archive' ) );
+		add_action( 'template_redirect', array( $this, 'set_menu_archive' ) );
+		// add_action( 'pre_get_posts', array( $this, 'set_menu_archive' ), 20 );
 	}
 
 	/**
@@ -38,12 +39,17 @@ class Mobile_Order_Object_Template {
 	 *
 	 * @since 0.1.0
 	 */
-	public function set_menu_archive( $query ) {
+	public function set_menu_archive() {
+
+		global $wp_query;
 
 		if ( 'menu' == get_query_var( 'pagename' ) && ! get_page_by_path( 'menu' ) ) {
 
-			status_header( 200 );
-        	$query->is_404 = false;
+			unset( $wp_query->query['page'] );
+			unset( $wp_query->query['pagename'] );
+
+			$wp_query->is_archive 	= true;
+			$wp_query->is_404 		= false;
 
 		}
 
