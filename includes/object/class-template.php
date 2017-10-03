@@ -51,6 +51,8 @@ class Mobile_Order_Object_Template {
 			$wp_query->is_archive 	= true;
 			$wp_query->is_404 		= false;
 
+			status_header( 200 );
+			
 		}
 
 	}
